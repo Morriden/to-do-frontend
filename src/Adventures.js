@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import './App.css'
 import request from 'superagent';
+import AdventuresUL from './AdventuresUL.js';
+import SubmitNewAdventure from './SubmitNewAdventure.js';
 
 export default class App extends Component {
 
@@ -15,9 +17,8 @@ export default class App extends Component {
       }
   }
 
-
   async componentDidMount() {
-    const fetchedData = await request.get('http://localhost:3000/api/adventures').set('authorization', this.props.token)
+    const fetchedData = await request.get('https://afternoon-coast-11547.herokuapp.com/api/adventures').set('authorization', this.props.token)
     const data = fetchedData.body
     this.setState({ adventures: data })
   }
@@ -25,7 +26,7 @@ export default class App extends Component {
   handleSubmit = async(e) => {
     const newArrayOfAdventures = this.state.adventures;
     e.preventDefault();
-    const newAdventure = await request.post(`http://localhost:3000/api/adventures`, {
+    const newAdventure = await request.post(`https://afternoon-coast-11547.herokuapp.com/api/adventures`, {
       name: this.state.name,
       danger_level: this.state.danger_level,
       is_completed: false
@@ -45,8 +46,8 @@ export default class App extends Component {
     this.setState({ danger_level: e.target.value })
   }
   handleClick = async(id) => {
-    await request.put(`http://localhost:3000/api/adventures/${id}`).set('authorization', this.props.token)
-    const fetchedData = await request.get('http://localhost:3000/api/adventures').set('authorization', this.props.token)
+    await request.put(`https://afternoon-coast-11547.herokuapp.com/api/adventures/${id}`).set('authorization', this.props.token)
+    const fetchedData = await request.get('https://afternoon-coast-11547.herokuapp.com/api/adventures').set('authorization', this.props.token)
     const newArrayOfAdventures = fetchedData.body
     this.setState({ adventures: newArrayOfAdventures })
   }
@@ -54,27 +55,11 @@ export default class App extends Component {
   render() {
     console.log(this.state)
     return (
-      <div>
-        <form onSubmit={this.handleSubmit}>
-          <label>
-            Name of the Adventure!
-            <input name="name" onChange={this.handleNameChange} />
-          </label>
-          <label>
-            How Dangerous is the Adventure?
-            <input name="danger_level" type="number" onChange={this.handleDangerChange} />
-          </label>
-          <button>Submit New Adventure</button>
-        </form>
-        <ul>
-          {
-            this.state.adventures.map(adventure => <li onClick={() => this.handleClick(adventure.id)} className={ adventure.completed ? 'complete' : 'incomplete'} >
-              <p>Adventure Name: {adventure.name}</p> 
-              <p>Danger Level: {adventure.danger_level}</p>
-              <p>Is The Adventure Completed? {String(adventure.is_completed)}</p>
-            </li>)
-          }
-        </ul>
+        <div>
+          <SubmitNewAdventure handleNameChange={this.handleNameChange} handleDangerChange={this.handleDangerChange} handleSubmit={this.handleSubmit}/>
+        <div>
+          <AdventuresUL adventures={this.state.adventures} handleClick={this.handleClick}/>
+        </div>
       </div>
     )
   }
